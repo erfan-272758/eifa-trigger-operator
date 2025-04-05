@@ -25,17 +25,12 @@ import (
 
 // EifaTriggerSpec defines the desired state of EifaTrigger
 type EifaTriggerSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
-
-	// Foo is an example field of EifaTrigger. Edit eifatrigger_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	WatchLabelSelector map[string]string `json:"watchLabelSelector"`
+	ApplyLabelSelector map[string]string `json:"applyLabelSelector"`
 }
 
 // EifaTriggerStatus defines the observed state of EifaTrigger
 type EifaTriggerStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
 }
 
 // +kubebuilder:object:root=true

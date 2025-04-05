@@ -1,11 +1,32 @@
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  labels:
-    app.kubernetes.io/name: eifa-trigger-operator
-    app.kubernetes.io/managed-by: kustomize
   name: manager-role
 rules:
-- apiGroups: [""]
-  resources: ["pods"]
-  verbs: ["get", "list", "watch"]
+- apiGroups:
+  - trigger.eifa.org
+  resources:
+  - eifatriggers
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - trigger.eifa.org
+  resources:
+  - eifatriggers/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - trigger.eifa.org
+  resources:
+  - eifatriggers/status
+  verbs:
+  - get
+  - patch
+  - update
