@@ -1,0 +1,27 @@
+# permissions for end users to edit eifatriggers.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: eifa-trigger-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: eifatrigger-editor-role
+rules:
+- apiGroups:
+  - trigger.eifa.org
+  resources:
+  - eifatriggers
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - trigger.eifa.org
+  resources:
+  - eifatriggers/status
+  verbs:
+  - get

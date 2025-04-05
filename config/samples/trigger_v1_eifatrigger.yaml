@@ -1,0 +1,9 @@
+apiVersion: trigger.eifa.org/v1
+kind: EifaTrigger
+metadata:
+  labels:
+    app.kubernetes.io/name: eifa-trigger-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: eifatrigger-sample
+spec:
+  # TODO(user): Add fields here
