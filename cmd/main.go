@@ -37,6 +37,7 @@ import (
 
 	triggerv1 "github.com/erfan-272758/eif-trigger-operator/api/v1"
 	"github.com/erfan-272758/eif-trigger-operator/internal/controller"
+	_ "github.com/erfan-272758/eif-trigger-operator/internal/store"
 	// +kubebuilder:scaffold:imports
 )
 

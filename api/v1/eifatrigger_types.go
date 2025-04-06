@@ -25,12 +25,13 @@ import (
 
 // EifaTriggerSpec defines the desired state of EifaTrigger
 type EifaTriggerSpec struct {
-	WatchLabelSelector map[string]string `json:"watchLabelSelector"`
-	ApplyLabelSelector map[string]string `json:"applyLabelSelector"`
+	WatchLabelSelector  map[string]string `json:"watchLabelSelector"`
+	UpdateLabelSelector map[string]string `json:"updateLabelSelector"`
 }
 
 // EifaTriggerStatus defines the observed state of EifaTrigger
 type EifaTriggerStatus struct {
+	ObservedGeneration int64 `json:"observedGeneration"`
 }
 
 // +kubebuilder:object:root=true

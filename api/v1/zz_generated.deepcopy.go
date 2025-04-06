@@ -93,8 +93,8 @@ func (in *EifaTriggerSpec) DeepCopyInto(out *EifaTriggerSpec) {
 			(*out)[key] = val
 		}
 	}
-	if in.ApplyLabelSelector != nil {
-		in, out := &in.ApplyLabelSelector, &out.ApplyLabelSelector
+	if in.UpdateLabelSelector != nil {
+		in, out := &in.UpdateLabelSelector, &out.UpdateLabelSelector
 		*out = make(map[string]string, len(*in))
 		for key, val := range *in {
 			(*out)[key] = val

@@ -39,7 +39,7 @@ spec:
           spec:
             description: EifaTriggerSpec defines the desired state of EifaTrigger
             properties:
-              applyLabelSelector:
+              updateLabelSelector:
                 additionalProperties:
                   type: string
                 type: object
@@ -48,7 +48,7 @@ spec:
                   type: string
                 type: object
             required:
-            - applyLabelSelector
+            - updateLabelSelector
             - watchLabelSelector
             type: object
           status:
