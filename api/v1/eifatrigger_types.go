@@ -24,9 +24,19 @@ import (
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
 // EifaTriggerSpec defines the desired state of EifaTrigger
+type WatchSelector struct {
+	// +kubebuilder:validation:Enum={"Deployment","DaemonSet"}
+	Kind          string            `json:"kind"`
+	LabelSelector map[string]string `json:"labelSelector"`
+}
+type UpdateSelector struct {
+	// +kubebuilder:validation:Enum={"ConfigMap","Secret"}
+	Kind          string            `json:"kind"`
+	LabelSelector map[string]string `json:"labelSelector"`
+}
 type EifaTriggerSpec struct {
-	WatchLabelSelector  map[string]string `json:"watchLabelSelector"`
-	UpdateLabelSelector map[string]string `json:"updateLabelSelector"`
+	Watch  WatchSelector  `json:"watch"`
+	Update UpdateSelector `json:"update"`
 }
 
 // EifaTriggerStatus defines the observed state of EifaTrigger

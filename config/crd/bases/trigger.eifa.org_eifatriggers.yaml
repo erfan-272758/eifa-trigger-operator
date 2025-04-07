@@ -37,22 +37,50 @@ spec:
           metadata:
             type: object
           spec:
-            description: EifaTriggerSpec defines the desired state of EifaTrigger
             properties:
-              updateLabelSelector:
-                additionalProperties:
-                  type: string
+              update:
+                properties:
+                  kind:
+                    enum:
+                    - ConfigMap
+                    - Secret
+                    type: string
+                  labelSelector:
+                    additionalProperties:
+                      type: string
+                    type: object
+                required:
+                - kind
+                - labelSelector
                 type: object
-              watchLabelSelector:
-                additionalProperties:
-                  type: string
+              watch:
+                description: EifaTriggerSpec defines the desired state of EifaTrigger
+                properties:
+                  kind:
+                    enum:
+                    - Deployment
+                    - DaemonSet
+                    type: string
+                  labelSelector:
+                    additionalProperties:
+                      type: string
+                    type: object
+                required:
+                - kind
+                - labelSelector
                 type: object
             required:
-            - updateLabelSelector
-            - watchLabelSelector
+            - update
+            - watch
             type: object
           status:
             description: EifaTriggerStatus defines the observed state of EifaTrigger
+            properties:
+              observedGeneration:
+                format: int64
+                type: integer
+            required:
+            - observedGeneration
             type: object
         type: object
     served: true
