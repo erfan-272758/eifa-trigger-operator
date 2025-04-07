@@ -6,6 +6,8 @@ import (
 	triggerv1 "github.com/erfan-272758/eif-trigger-operator/api/v1"
 	corev1 "k8s.io/api/core/v1"
 
+	goruntime "runtime"
+
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
@@ -75,6 +77,6 @@ func (r *EifaTriggerReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		For(&triggerv1.EifaTrigger{}).
 		Watches(&corev1.ConfigMap{}, watchHandler, builder.WithPredicates(predicate.NewPredicateFuncs(WatchPredicateFunc))).
 		Watches(&corev1.Secret{}, watchHandler, builder.WithPredicates(predicate.NewPredicateFuncs(WatchPredicateFunc))).
-		WithOptions(controller.Options{MaxConcurrentReconciles: 100}).
+		WithOptions(controller.Options{MaxConcurrentReconciles: goruntime.NumCPU()}).
 		Complete(r)
 }

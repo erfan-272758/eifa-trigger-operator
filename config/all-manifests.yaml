@@ -366,7 +366,7 @@ spec:
         - --health-probe-bind-address=:8081
         command:
         - /manager
-        image: erfan272758/eifa-trigger-operator:v1
+        image: erfan272758/eifa-trigger-operator:v1.0.0
         livenessProbe:
           httpGet:
             path: /healthz
