@@ -10,6 +10,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
@@ -74,5 +75,6 @@ func (r *EifaTriggerReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		For(&triggerv1.EifaTrigger{}).
 		Watches(&corev1.ConfigMap{}, watchHandler, builder.WithPredicates(predicate.NewPredicateFuncs(WatchPredicateFunc))).
 		Watches(&corev1.Secret{}, watchHandler, builder.WithPredicates(predicate.NewPredicateFuncs(WatchPredicateFunc))).
+		WithOptions(controller.Options{MaxConcurrentReconciles: 100}).
 		Complete(r)
 }
