@@ -24,7 +24,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/erfan-272758/eif-trigger-operator/test/utils"
+	"github.com/erfan-272758/eifa-trigger-operator/test/utils"
 )
 
 const namespace = "eifa-trigger-operator-system"

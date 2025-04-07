@@ -27,7 +27,7 @@ import (
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	triggerv1 "github.com/erfan-272758/eif-trigger-operator/api/v1"
+	triggerv1 "github.com/erfan-272758/eifa-trigger-operator/api/v1"
 )
 
 var _ = Describe("EifaTrigger Controller", func() {

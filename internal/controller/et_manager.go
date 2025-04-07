@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
-	triggerv1 "github.com/erfan-272758/eif-trigger-operator/api/v1"
+	triggerv1 "github.com/erfan-272758/eifa-trigger-operator/api/v1"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"

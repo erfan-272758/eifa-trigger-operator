@@ -1,4 +1,4 @@
-module github.com/erfan-272758/eif-trigger-operator
+module github.com/erfan-272758/eifa-trigger-operator
 
 go 1.22.0
 

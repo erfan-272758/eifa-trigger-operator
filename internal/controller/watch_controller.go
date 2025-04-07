@@ -3,7 +3,7 @@ package controller
 import (
 	"context"
 
-	"github.com/erfan-272758/eif-trigger-operator/internal/store"
+	"github.com/erfan-272758/eifa-trigger-operator/internal/store"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/util/workqueue"
 	"sigs.k8s.io/controller-runtime/pkg/client"
