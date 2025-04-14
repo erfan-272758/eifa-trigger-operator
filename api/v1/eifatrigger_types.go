@@ -23,6 +23,11 @@ import (
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
+const (
+	FAILED  = "Failed"
+	SUCCESS = "Success"
+)
+
 // EifaTriggerSpec defines the desired state of EifaTrigger
 type WatchSelector struct {
 	// +kubebuilder:validation:Enum={"ConfigMap","Secret"}
@@ -41,7 +46,7 @@ type EifaTriggerSpec struct {
 
 // EifaTriggerStatus defines the observed state of EifaTrigger
 type EifaTriggerStatus struct {
-	ObservedGeneration int64 `json:"observedGeneration"`
+	Conditions []metav1.Condition `json:"conditions,omitempty" patchStrategy:"merge" patchMergeKey:"type" protobuf:"bytes,1,rep,name=conditions"`
 }
 
 // +kubebuilder:object:root=true

@@ -26,6 +26,6 @@ func (e *WatchHandler) Update(ctx context.Context, evt event.TypedUpdateEvent[cl
 	OnChange(e.Client, evt.ObjectNew)
 }
 
-func WatchPredicateFunc(obj client.Object) bool {
-	return store.Get().IsInWatchList(obj)
+func WatchPredicateFunc(watchObject client.Object) bool {
+	return store.Get().IsInWatchList(watchObject)
 }

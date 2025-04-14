@@ -220,6 +220,7 @@ rules:
   verbs:
   - get
   - list
+  - update
   - watch
 - apiGroups:
   - trigger.eifa.org

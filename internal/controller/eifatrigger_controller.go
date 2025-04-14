@@ -8,6 +8,7 @@ import (
 
 	goruntime "runtime"
 
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
@@ -60,6 +61,13 @@ func (r *EifaTriggerReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 
 	if err != nil {
 		log.Error(err, "Error from Handler")
+		r.UpdateStatus(ctx, eifaTrigger, &metav1.Condition{
+			Type:               triggerv1.FAILED,
+			Status:             metav1.ConditionTrue,
+			LastTransitionTime: metav1.Now(),
+			Reason:             "ReconcileHandlerError",
+			Message:            err.Error(),
+		})
 		return reconcile.Result{}, err
 	}
 

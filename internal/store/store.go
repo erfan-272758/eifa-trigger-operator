@@ -1,6 +1,7 @@
 package store
 
 import (
+	"strings"
 	"sync"
 
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -14,8 +15,9 @@ func init() {
 }
 
 type Store struct {
-	data map[string][]client.Object
-	l    sync.RWMutex
+	wToU   map[string][]client.Object
+	wuToET map[string][]client.Object
+	l      sync.RWMutex
 }
 
 func Get() *Store {
@@ -24,61 +26,102 @@ func Get() *Store {
 
 func newStore() Store {
 	return Store{
-		data: make(map[string][]client.Object, 0),
+		wToU:   make(map[string][]client.Object, 0),
+		wuToET: make(map[string][]client.Object, 0),
 	}
 }
 
-func (s *Store) getKey(obj client.Object) string {
-	return obj.GetNamespace() + "_" + obj.GetName()
+func (s *Store) getKey(objs ...client.Object) string {
+	keys := make([]string, 0, len(objs))
+	for _, obj := range objs {
+		keys = append(keys, obj.GetNamespace()+"_"+obj.GetName())
+	}
+	return strings.Join(keys, ":")
+
 }
-func (s *Store) append(key string, u client.Object) {
-	if uList, ok := s.data[key]; ok {
-		uList = append(uList, u)
-		s.data[key] = uList
+func (s *Store) append(data map[string][]client.Object, key string, o client.Object) {
+	if l, ok := data[key]; ok {
+		l = append(l, o)
+		data[key] = l
 	} else {
-		s.data[key] = []client.Object{u}
+		data[key] = []client.Object{o}
 	}
 }
+func (s *Store) appendToUpdate(key string, u client.Object) {
+	s.append(s.wToU, key, u)
+}
+func (s *Store) appendToET(key string, et client.Object) {
+	s.append(s.wuToET, key, et)
+}
 
-func (s *Store) Add(wList []client.Object, uList []client.Object) {
+func (s *Store) Add(et client.Object, wList []client.Object, uList []client.Object) {
 	for _, w := range wList {
 		for _, u := range uList {
 			s.l.Lock()
-			s.append(s.getKey(w), u)
+			// append to map watch=>update
+			s.appendToUpdate(s.getKey(w), u)
+
+			// append to map {watch,update}=>et
+			s.appendToET(s.getKey(w, u), et)
 			s.l.Unlock()
 		}
 	}
 }
-func (s *Store) Delete(objList []client.Object) {
-	for _, o := range objList {
+func (s *Store) Delete(watchList []client.Object) {
+	for _, w := range watchList {
+		// get update lists
+		uList := s.GetUpdateList(w)
+
+		for _, u := range uList {
+			// delete et from {watch,update}
+			s.l.Lock()
+			delete(s.wuToET, s.getKey(w, u))
+			s.l.Unlock()
+		}
+
+		// delete update from watch
 		s.l.Lock()
-		delete(s.data, s.getKey(o))
+		delete(s.wToU, s.getKey(w))
 		s.l.Unlock()
 	}
 }
-func (s *Store) Update(wList []client.Object, uList []client.Object) {
+func (s *Store) Update(et client.Object, wList []client.Object, uList []client.Object) {
 	s.Delete(wList)
 	for _, w := range wList {
 		for _, u := range uList {
 			s.l.Lock()
-			s.append(s.getKey(w), u)
+			// append to map watch=>update
+			s.appendToUpdate(s.getKey(w), u)
+
+			// append to map {watch,update}=>et
+			s.appendToET(s.getKey(w, u), et)
 			s.l.Unlock()
+
 		}
 	}
 }
 
-func (s *Store) IsInWatchList(obj client.Object) bool {
+func (s *Store) IsInWatchList(w client.Object) bool {
 	s.l.RLock()
 	defer s.l.RUnlock()
-	uList, ok := s.data[s.getKey(obj)]
+	uList, ok := s.wToU[s.getKey(w)]
 	return ok && len(uList) > 0
 }
 func (s *Store) GetUpdateList(watchObj client.Object) []client.Object {
 	s.l.RLock()
 	defer s.l.RUnlock()
-	u, ok := s.data[s.getKey(watchObj)]
+	uList, ok := s.wToU[s.getKey(watchObj)]
 	if !ok {
 		return nil
 	}
-	return u
+	return uList
+}
+func (s *Store) GetETList(watchObj client.Object, updateObj client.Object) []client.Object {
+	s.l.RLock()
+	defer s.l.RUnlock()
+	etList, ok := s.wuToET[s.getKey(watchObj, updateObj)]
+	if !ok {
+		return nil
+	}
+	return etList
 }

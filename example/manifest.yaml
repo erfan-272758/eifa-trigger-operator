@@ -9,7 +9,7 @@ metadata:
   name: et-nginx
   namespace: erfan
   labels:
-    app: et-watch
+    app: et-update
 spec:
   selector:
     matchLabels:
@@ -38,9 +38,9 @@ metadata:
   name: et-cm
   namespace: erfan
   labels:
-    app: et-update
+    app: et-watch
 data:
-  key: value
+  key: value3
 ---
 apiVersion: trigger.eifa.org/v1
 kind: EifaTrigger
@@ -48,11 +48,11 @@ metadata:
   name: et
   namespace: erfan
 spec:
-  update:
+  watch:
     kind: ConfigMap
     labelSelector:
-      app: et-update
-  watch:
+      app: et-watch
+  update:
     kind: Deployment
     labelSelector:
-      app: et-watch
+      app: et-update

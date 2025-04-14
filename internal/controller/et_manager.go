@@ -167,3 +167,22 @@ func (r *EifaTriggerReconciler) FetchWList(ctx context.Context, et *triggerv1.Ei
 
 	return nil, fmt.Errorf("invalid .Spec.Watch.Kind, %s", et.Spec.Watch.Kind)
 }
+
+func (r *EifaTriggerReconciler) UpdateStatus(ctx context.Context, et *triggerv1.EifaTrigger, cond *metav1.Condition) error {
+	return UpdateStatus(ctx, r.Client, et, cond)
+}
+
+func UpdateStatus(ctx context.Context, c client.Client, et *triggerv1.EifaTrigger, cond *metav1.Condition) error {
+	if cond == nil {
+		// nothing to do
+		return nil
+	}
+	// append
+	et.Status.Conditions = append(et.Status.Conditions, *cond)
+
+	// store only last 10 conditions
+	if len(et.Status.Conditions) > 10 {
+		et.Status.Conditions = et.Status.Conditions[len(et.Status.Conditions)-10:]
+	}
+	return c.Status().Update(ctx, et)
+}
