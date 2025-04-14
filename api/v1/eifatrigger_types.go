@@ -25,12 +25,12 @@ import (
 
 // EifaTriggerSpec defines the desired state of EifaTrigger
 type WatchSelector struct {
-	// +kubebuilder:validation:Enum={"Deployment","DaemonSet"}
+	// +kubebuilder:validation:Enum={"ConfigMap","Secret"}
 	Kind          string            `json:"kind"`
 	LabelSelector map[string]string `json:"labelSelector"`
 }
 type UpdateSelector struct {
-	// +kubebuilder:validation:Enum={"ConfigMap","Secret"}
+	// +kubebuilder:validation:Enum={"Deployment","DaemonSet"}
 	Kind          string            `json:"kind"`
 	LabelSelector map[string]string `json:"labelSelector"`
 }
@@ -46,6 +46,7 @@ type EifaTriggerStatus struct {
 
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
+// +kubebuilder:resource:shortName=et
 
 // EifaTrigger is the Schema for the eifatriggers API
 type EifaTrigger struct {
@@ -57,7 +58,6 @@ type EifaTrigger struct {
 }
 
 // +kubebuilder:object:root=true
-
 // EifaTriggerList contains a list of EifaTrigger
 type EifaTriggerList struct {
 	metav1.TypeMeta `json:",inline"`

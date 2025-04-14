@@ -2,6 +2,7 @@ package controller
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	triggerv1 "github.com/erfan-272758/eifa-trigger-operator/api/v1"
@@ -45,23 +46,27 @@ func (r *EifaTriggerReconciler) BeforeDelete(ctx context.Context, req ctrl.Reque
 	return nil
 }
 func (r *EifaTriggerReconciler) OnUpdate(ctx context.Context, req ctrl.Request, et *triggerv1.EifaTrigger) error {
+	log := log.FromContext(ctx)
 	// update store
 	wList, uList, err := r.FetchWUList(ctx, et)
 	if err != nil {
 		return err
 	}
+	log.Info("i got, ", fmt.Sprintf("watch: %v, update: %v", wList, uList))
+
 	store.Get().Update(wList, uList)
 
 	return r.Modify(ctx, et)
 }
 
 func OnChange(c client.Client, watchObj client.Object) {
+	ctx := context.Background()
+	log := log.FromContext(ctx)
+	log.Info(fmt.Sprintf("onChange call, %v", watchObj))
 	updateList := store.Get().GetUpdateList(watchObj)
 	if len(updateList) == 0 {
 		return
 	}
-	ctx := context.Background()
-	log := log.FromContext(ctx)
 
 	for _, updateObj := range updateList {
 

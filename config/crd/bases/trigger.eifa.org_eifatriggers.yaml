@@ -11,6 +11,8 @@ spec:
     kind: EifaTrigger
     listKind: EifaTriggerList
     plural: eifatriggers
+    shortNames:
+    - et
     singular: eifatrigger
   scope: Namespaced
   versions:
@@ -42,8 +44,8 @@ spec:
                 properties:
                   kind:
                     enum:
-                    - ConfigMap
-                    - Secret
+                    - Deployment
+                    - DaemonSet
                     type: string
                   labelSelector:
                     additionalProperties:
@@ -58,8 +60,8 @@ spec:
                 properties:
                   kind:
                     enum:
-                    - Deployment
-                    - DaemonSet
+                    - ConfigMap
+                    - Secret
                     type: string
                   labelSelector:
                     additionalProperties:
