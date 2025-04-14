@@ -24,8 +24,8 @@ type EifaTriggerReconciler struct {
 	Scheme *runtime.Scheme
 }
 
-// +kubebuilder:rbac:groups=apps,resources=deployments,verbs=get;list;watch
-// +kubebuilder:rbac:groups=apps,resources=daemonsets,verbs=get;list;watch
+// +kubebuilder:rbac:groups=apps,resources=deployments,verbs=get;list;watch;update
+// +kubebuilder:rbac:groups=apps,resources=daemonsets,verbs=get;list;watch;update
 // +kubebuilder:rbac:groups="",resources=configmaps,verbs=get;list;watch
 // +kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;watch
 // +kubebuilder:rbac:groups=trigger.eifa.org,resources=eifatriggers,verbs=get;list;watch;create;update;patch;delete
