@@ -75,7 +75,7 @@ func (r *EifaTriggerReconciler) Modify(ctx context.Context, et *triggerv1.EifaTr
 	if et.Annotations == nil {
 		et.Annotations = make(map[string]string, 1)
 	}
-	et.Annotations[Annotation_Observed_Generation] = string(et.Generation)
+	et.Annotations[Annotation_Observed_Generation] = fmt.Sprint(et.Generation)
 
 	return r.Update(ctx, et)
 }
