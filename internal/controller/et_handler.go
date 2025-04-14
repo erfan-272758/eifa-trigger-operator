@@ -121,7 +121,7 @@ func OnChange(c client.Client, watchObj client.Object) {
 				Status:             metav1.ConditionTrue,
 				LastTransitionTime: metav1.Now(),
 				Reason:             "UpdateObjectRestart",
-				Message:            fmt.Sprintf("successfully update %s because of changes at %s", updateObj.GetGenerateName(), watchObj.GetGenerateName()),
+				Message:            fmt.Sprintf("successfully update %s:%s because of changes at %s:%s", utils.DetectKind(updateObj), updateObj.GetName(), utils.DetectKind(watchObj), watchObj.GetName()),
 			})
 		}
 	}

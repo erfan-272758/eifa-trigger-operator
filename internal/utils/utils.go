@@ -5,6 +5,8 @@ import (
 	"os"
 
 	triggerv1 "github.com/erfan-272758/eifa-trigger-operator/api/v1"
+	appsv1 "k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -35,4 +37,20 @@ func UpdateStatus(ctx context.Context, c client.Client, et *triggerv1.EifaTrigge
 		et.Status.Conditions = et.Status.Conditions[len(et.Status.Conditions)-10:]
 	}
 	return c.Status().Update(ctx, et)
+}
+
+func DetectKind(o client.Object) string {
+	if _, ok := o.(*corev1.ConfigMap); ok {
+		return "ConfigMap"
+	}
+	if _, ok := o.(*corev1.Secret); ok {
+		return "Secret"
+	}
+	if _, ok := o.(*appsv1.Deployment); ok {
+		return "Deployment"
+	}
+	if _, ok := o.(*appsv1.DaemonSet); ok {
+		return "DaemonSet"
+	}
+	return "Unknown"
 }
