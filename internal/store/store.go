@@ -1,6 +1,7 @@
 package store
 
 import (
+	"slices"
 	"strings"
 	"sync"
 
@@ -41,11 +42,16 @@ func (s *Store) getKey(objs ...client.Object) string {
 }
 func (s *Store) append(data map[string][]client.Object, key string, o client.Object) {
 	if l, ok := data[key]; ok {
-		l = append(l, o)
-		data[key] = l
+		// append if not exist
+		if slices.IndexFunc(l, func(oldO client.Object) bool { return s.getKey(o) == s.getKey(oldO) }) == -1 {
+			l = append(l, o)
+			data[key] = l
+		}
+
 	} else {
 		data[key] = []client.Object{o}
 	}
+
 }
 func (s *Store) appendToUpdate(key string, u client.Object) {
 	s.append(s.wToU, key, u)
@@ -54,19 +60,6 @@ func (s *Store) appendToET(key string, et client.Object) {
 	s.append(s.wuToET, key, et)
 }
 
-func (s *Store) Add(et client.Object, wList []client.Object, uList []client.Object) {
-	for _, w := range wList {
-		for _, u := range uList {
-			s.l.Lock()
-			// append to map watch=>update
-			s.appendToUpdate(s.getKey(w), u)
-
-			// append to map {watch,update}=>et
-			s.appendToET(s.getKey(w, u), et)
-			s.l.Unlock()
-		}
-	}
-}
 func (s *Store) Delete(watchList []client.Object) {
 	for _, w := range watchList {
 		// get update lists

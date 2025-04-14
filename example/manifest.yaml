@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
       - name: et-nginx
-        image: nginx
+        image: repo-afra.snappfood.dev/nginx
         envFrom:
         - configMapRef:
             name: et-cm
@@ -40,7 +40,7 @@ metadata:
   labels:
     app: et-watch
 data:
-  key: value2
+  key: value26
 ---
 apiVersion: trigger.eifa.org/v1
 kind: EifaTrigger

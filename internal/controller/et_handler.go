@@ -27,7 +27,7 @@ func (r *EifaTriggerReconciler) AfterCreate(ctx context.Context, req ctrl.Reques
 	if err != nil {
 		return err
 	}
-	store.Get().Add(et, wList, uList)
+	store.Get().Update(et, wList, uList)
 
 	// update
 	return r.Modify(ctx, et)

@@ -4,6 +4,15 @@
 ## Description
 // TODO(user): An in-depth paragraph about your project and overview of use
 
+
+    type: Success
+  - lastTransitionTime: "2025-04-14T14:01:39Z"
+    message: 'Operation cannot be fulfilled on deployments.apps "et-nginx": the object
+      has been modified; please apply your changes to the latest version and try again'
+    reason: UpdateObjectRestartError
+    status: "True"
+    type: Failed
+
 ## Getting Started
 
 ### Prerequisites
