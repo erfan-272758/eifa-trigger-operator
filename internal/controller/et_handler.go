@@ -7,6 +7,7 @@ import (
 
 	triggerv1 "github.com/erfan-272758/eifa-trigger-operator/api/v1"
 	"github.com/erfan-272758/eifa-trigger-operator/internal/store"
+	"github.com/erfan-272758/eifa-trigger-operator/internal/utils"
 	appsv1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -130,7 +131,7 @@ func OnChange(c client.Client, watchObj client.Object) {
 func updateEtStatus(ctx context.Context, c client.Client, etList []client.Object, cond *metav1.Condition) {
 	for _, o := range etList {
 		if et, ok := o.(*triggerv1.EifaTrigger); ok {
-			UpdateStatus(ctx, c, et, cond)
+			utils.UpdateStatus(ctx, c, et, cond)
 		}
 	}
 }

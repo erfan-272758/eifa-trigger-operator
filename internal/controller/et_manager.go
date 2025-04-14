@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	triggerv1 "github.com/erfan-272758/eifa-trigger-operator/api/v1"
+	"github.com/erfan-272758/eifa-trigger-operator/internal/utils"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -23,6 +24,7 @@ const (
 	AFTER_DELETE                   = "after-delete"
 	UNKNOWN                        = "unknown"
 	Annotation_Observed_Generation = "eifa-trigger-operator-manager/observed-generation"
+	Annotation_Observer_UID        = "eifa-trigger-operator-manager/observer-uid"
 )
 
 func (r *EifaTriggerReconciler) Fetch(ctx context.Context, req ctrl.Request) (*triggerv1.EifaTrigger, string, error) {
@@ -43,7 +45,13 @@ func (r *EifaTriggerReconciler) Fetch(ctx context.Context, req ctrl.Request) (*t
 	}
 
 	// export Observed Generation
-	var og int64
+	var (
+		og          int64
+		is_observer bool
+	)
+	// if observer annotation match to my id
+	is_observer = eifaTrigger.GetAnnotations()[Annotation_Observer_UID] == utils.GetId()
+
 	og_raw := eifaTrigger.GetAnnotations()[Annotation_Observed_Generation]
 	if og_raw == "" {
 		og = 0
@@ -61,7 +69,7 @@ func (r *EifaTriggerReconciler) Fetch(ctx context.Context, req ctrl.Request) (*t
 	}
 
 	// on observed update
-	if og == eifaTrigger.Generation {
+	if og == eifaTrigger.Generation && is_observer {
 		return eifaTrigger, ON_OBSERVED_UPDATE, nil
 	}
 
@@ -76,6 +84,7 @@ func (r *EifaTriggerReconciler) Modify(ctx context.Context, et *triggerv1.EifaTr
 		et.Annotations = make(map[string]string, 1)
 	}
 	et.Annotations[Annotation_Observed_Generation] = fmt.Sprint(et.Generation)
+	et.Annotations[Annotation_Observer_UID] = utils.GetId()
 
 	return r.Update(ctx, et)
 }
@@ -169,20 +178,5 @@ func (r *EifaTriggerReconciler) FetchWList(ctx context.Context, et *triggerv1.Ei
 }
 
 func (r *EifaTriggerReconciler) UpdateStatus(ctx context.Context, et *triggerv1.EifaTrigger, cond *metav1.Condition) error {
-	return UpdateStatus(ctx, r.Client, et, cond)
-}
-
-func UpdateStatus(ctx context.Context, c client.Client, et *triggerv1.EifaTrigger, cond *metav1.Condition) error {
-	if cond == nil {
-		// nothing to do
-		return nil
-	}
-	// append
-	et.Status.Conditions = append(et.Status.Conditions, *cond)
-
-	// store only last 10 conditions
-	if len(et.Status.Conditions) > 10 {
-		et.Status.Conditions = et.Status.Conditions[len(et.Status.Conditions)-10:]
-	}
-	return c.Status().Update(ctx, et)
+	return utils.UpdateStatus(ctx, r.Client, et, cond)
 }
