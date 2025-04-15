@@ -36,6 +36,10 @@ func UpdateStatus(ctx context.Context, c client.Client, et *triggerv1.EifaTrigge
 	if len(et.Status.Conditions) > 10 {
 		et.Status.Conditions = et.Status.Conditions[len(et.Status.Conditions)-10:]
 	}
+
+	// update last message
+	et.Status.LastMessage = cond.Message
+
 	return c.Status().Update(ctx, et)
 }
 

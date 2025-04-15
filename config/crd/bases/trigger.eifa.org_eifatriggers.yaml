@@ -16,7 +16,12 @@ spec:
     singular: eifatrigger
   scope: Namespaced
   versions:
-  - name: v1
+  - additionalPrinterColumns:
+    - description: Latest Message
+      jsonPath: .status.lastMessage
+      name: Message
+      type: string
+    name: v1
     schema:
       openAPIV3Schema:
         description: EifaTrigger is the Schema for the eifatriggers API
@@ -171,6 +176,8 @@ spec:
                   - type
                   type: object
                 type: array
+              lastMessage:
+                type: string
             type: object
         type: object
     served: true

@@ -24,7 +24,12 @@ spec:
     singular: eifatrigger
   scope: Namespaced
   versions:
-  - name: v1
+  - additionalPrinterColumns:
+    - description: Latest Message
+      jsonPath: .status.lastMessage
+      name: Message
+      type: string
+    name: v1
     schema:
       openAPIV3Schema:
         description: EifaTrigger is the Schema for the eifatriggers API
@@ -179,6 +184,8 @@ spec:
                   - type
                   type: object
                 type: array
+              lastMessage:
+                type: string
             type: object
         type: object
     served: true
@@ -439,7 +446,7 @@ metadata:
   name: eifa-trigger-operator-controller-manager
   namespace: eifa-trigger-operator-system
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       control-plane: controller-manager
@@ -475,7 +482,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.uid
-        image: erfan272758/eifa-trigger-operator:v1.2.1
+        image: erfan272758/eifa-trigger-operator:v1.2.2
         livenessProbe:
           httpGet:
             path: /healthz

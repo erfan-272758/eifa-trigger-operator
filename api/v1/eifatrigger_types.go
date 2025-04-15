@@ -48,12 +48,14 @@ type EifaTriggerSpec struct {
 
 // EifaTriggerStatus defines the observed state of EifaTrigger
 type EifaTriggerStatus struct {
-	Conditions []metav1.Condition `json:"conditions,omitempty" patchStrategy:"merge" patchMergeKey:"type" protobuf:"bytes,1,rep,name=conditions"`
+	Conditions  []metav1.Condition `json:"conditions,omitempty" patchStrategy:"merge" patchMergeKey:"type" protobuf:"bytes,1,rep,name=conditions"`
+	LastMessage string             `json:"lastMessage,omitempty"`
 }
 
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:shortName=et
+// +kubebuilder:printcolumn:name="Message",type=string,JSONPath=`.status.lastMessage`,description="Latest Message"
 
 // EifaTrigger is the Schema for the eifatriggers API
 type EifaTrigger struct {
