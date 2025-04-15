@@ -40,7 +40,7 @@ metadata:
   labels:
     app: et-watch
 data:
-  key: value22
+  key: value222
 ---
 apiVersion: v1
 kind: Secret

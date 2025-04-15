@@ -29,6 +29,9 @@ spec:
       jsonPath: .status.lastMessage
       name: Message
       type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
     name: v1
     schema:
       openAPIV3Schema:
@@ -482,7 +485,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.uid
-        image: erfan272758/eifa-trigger-operator:v1.2.2
+        image: erfan272758/eifa-trigger-operator:v1.2.3
         livenessProbe:
           httpGet:
             path: /healthz

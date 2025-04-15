@@ -56,6 +56,7 @@ type EifaTriggerStatus struct {
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:shortName=et
 // +kubebuilder:printcolumn:name="Message",type=string,JSONPath=`.status.lastMessage`,description="Latest Message"
+// +kubebuilder:printcolumn:name="Age",type="date",JSONPath=".metadata.creationTimestamp"
 
 // EifaTrigger is the Schema for the eifatriggers API
 type EifaTrigger struct {
