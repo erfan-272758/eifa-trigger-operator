@@ -1,7 +1,8 @@
 # eifa-trigger-operator
 
 A lightweight, Custom Resource-based Kubernetes Operator built using [Operator SDK](https://sdk.operatorframework.io/) and Golang.  
-🌀 eifa-trigger-operator automatically restarts Deployments or DaemonSets when specific ConfigMaps or Secrets change — using the power of a Kubernetes Custom Resource.
+
+- 🌀 eifa-trigger-operator automatically restarts Deployments or DaemonSets when specific ConfigMaps or Secrets change — using the power of a Kubernetes Custom Resource.
 
 ---
 
