@@ -62,6 +62,15 @@ kubectl apply -f example/manifest.yaml
 > ✅ Supports both single and multiple `watch`/`update` items through `watchList` and `updateList`.
 
 ---
+## 📘 Status & Conditions
+
+The operator updates status fields automatically after processing:
+
+- `status.conditions`: Standard Kubernetes-style conditions
+- `status.lastMessage`: Latest activity message for observability
+
+---
+
 ## 📈 Status Monitoring
 
 Each EifaTrigger resource provides a live status indicating the latest trigger activity:
@@ -78,21 +87,6 @@ status:
 ```
 
 This gives you visibility into what happened and when directly from the CR.
-
----
-## 📂 Project Structure
-
-- **api/v1/eifatrigger_types.go**  
-  - Defines the Go structure of the `EifaTrigger` CRD, with validation, status, and CLI printing annotations.
-  
-- **controllers/eifatrigger_controller.go**  
-  - Contains controller logic that reconciles EifaTrigger resources and watches for changes.
-
-- **example/manifest.yaml**  
-  - An example manifest demonstrating how to use the operator with a ConfigMap and Deployment.
-
-- **config/all-manifests.yaml**  
-  - Pre-built manifest that bundles operator deployment and CRDs for simple installation.
 
 ---
 ## 🛠️ Installation
@@ -142,15 +136,21 @@ kubectl apply -f config/all-manifests.yaml
 ```
 
 ---
-## 📘 Status & Conditions
+## 📂 Project Structure
 
-The operator updates status fields automatically after processing:
+- **api/v1/eifatrigger_types.go**  
+  - Defines the Go structure of the `EifaTrigger` CRD, with validation, status, and CLI printing annotations.
+  
+- **controllers/eifatrigger_controller.go**  
+  - Contains controller logic that reconciles EifaTrigger resources and watches for changes.
 
-- `status.conditions`: Standard Kubernetes-style conditions
-- `status.lastMessage`: Latest activity message for observability
+- **example/manifest.yaml**  
+  - An example manifest demonstrating how to use the operator with a ConfigMap and Deployment.
+
+- **config/all-manifests.yaml**  
+  - Pre-built manifest that bundles operator deployment and CRDs for simple installation.
 
 ---
-
 ## ⚖️ License
 
 Licensed under the [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0).  
