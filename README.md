@@ -1,123 +1,175 @@
 # eifa-trigger-operator
-// TODO(user): Add simple overview of use/purpose
 
-## Description
-// TODO(user): An in-depth paragraph about your project and overview of use
+A lightweight, Custom Resource-based Kubernetes Operator built using [Operator SDK](https://sdk.operatorframework.io/) and Golang.  
+🌀 eifa-trigger-operator automatically restarts Deployments or DaemonSets when specific ConfigMaps or Secrets change — using the power of a Kubernetes Custom Resource.
+
+---
+
+## 🔍 What It Does
+
+- Monitors one or more ConfigMaps or Secrets based on label selectors.
+- On detected changes, triggers rollout restarts of targeted Deployments or DaemonSets.
+- Tracks status and last triggered message via `.status.conditions` and `.status.lastMessage` in your `EifaTrigger` resource.
+- Powered by Kubernetes-native Conditions and Operator SDK scaffolding.
+
+---
 
 
-    type: Success
-  - lastTransitionTime: "2025-04-14T14:01:39Z"
-    message: 'Operation cannot be fulfilled on deployments.apps "et-nginx": the object
-      has been modified; please apply your changes to the latest version and try again'
-    reason: UpdateObjectRestartError
-    status: "True"
-    type: Failed
+## 🧬 Custom Resource: EifaTrigger
 
-## Getting Started
+### API
 
-### Prerequisites
-- go version v1.22.0+
-- docker version 17.03+.
-- kubectl version v1.11.3+.
-- Access to a Kubernetes v1.11.3+ cluster.
+- **Group**: `trigger.eifa.org`
+- **Version**: `v1`
+- **Kind**: `EifaTrigger`
 
-### To Deploy on the cluster
-**Build and push your image to the location specified by `IMG`:**
+## 🧬 EifaTrigger Custom Resource Definition (CRD)
 
-```sh
-make docker-build docker-push IMG=<some-registry>/eifa-trigger-operator:tag
+| Field         | Description                                                        |
+|---------------|--------------------------------------------------------------------|
+| `watch`  | Defines the ConfigMap or Secret to watch using label selectors     |
+| `update` | Defines the Deployment or DaemonSet to trigger on change           |
+| `watchList` / `updateList` | Support multiple resources with flexible selectors     |
+---
+
+### 📨 Example Manifest
+
+```yaml
+apiVersion: trigger.eifa.org/v1
+kind: EifaTrigger
+metadata:
+  name: example-trigger
+spec:
+  watchList:
+    - kind: ConfigMap
+      labelSelector:
+        et-kind: watch
+    - kind: Secret
+      labelSelector:
+        et-kind: watch
+  updateList:
+    - kind: Deployment
+      labelSelector:
+        et-kind: update
+```
+Or you can apply example with:
+
+```bash
+kubectl apply -f example/manifest.yaml
 ```
 
-**NOTE:** This image ought to be published in the personal registry you specified.
-And it is required to have access to pull the image from the working environment.
-Make sure you have the proper permission to the registry if the above commands don’t work.
+> ✅ Supports both single and multiple `watch`/`update` items through `watchList` and `updateList`.
 
-**Install the CRDs into the cluster:**
+---
+## 📈 Status Monitoring
 
-```sh
-make install
+Each EifaTrigger resource provides a live status indicating the latest trigger activity:
+
+```yaml
+status:
+  lastMessage: successfully update Deployment:et-nginx because of changes at ConfigMap:et-cm
+  conditions:
+    - lastTransitionTime: "2025-04-15T08:30:55Z"
+      message: successfully update Deployment:et-nginx because of changes at ConfigMap:et-cm
+      reason: UpdateObjectRestart
+      status: "True"
+      type: Success
 ```
 
-**Deploy the Manager to the cluster with the image specified by `IMG`:**
+This gives you visibility into what happened and when directly from the CR.
 
-```sh
-make deploy IMG=<some-registry>/eifa-trigger-operator:tag
+---
+## 📂 Project Structure
+
+- **api/v1/eifatrigger_types.go**  
+  - Defines the Go structure of the `EifaTrigger` CRD, with validation, status, and CLI printing annotations.
+  
+- **controllers/eifatrigger_controller.go**  
+  - Contains controller logic that reconciles EifaTrigger resources and watches for changes.
+
+- **example/manifest.yaml**  
+  - An example manifest demonstrating how to use the operator with a ConfigMap and Deployment.
+
+- **config/all-manifests.yaml**  
+  - Pre-built manifest that bundles operator deployment and CRDs for simple installation.
+
+---
+## 🛠️ Installation
+
+You can install the operator in your cluster using a single command — no cloning required.
+
+### 🔹 Quick Install (kubectl apply)
+
+```bash
+kubectl apply -f https://raw.githubusercontent.com/erfan-272758/eifa-trigger-operator/main/config/all-manifests.yaml
 ```
 
-> **NOTE**: If you encounter RBAC errors, you may need to grant yourself cluster-admin
-privileges or be logged in as admin.
+This deploys:
 
-**Create instances of your solution**
-You can apply the samples (examples) from the config/sample:
+- The EifaTrigger CRD
+- Role/RoleBinding and Service Account
+- Operator deployment
 
-```sh
-kubectl apply -k config/samples/
+---
+
+## 🛠️ Development & Contributing
+
+### Cloning
+
+```bash
+git clone https://github.com/erfan-272758/eifa-trigger-operator.git
+cd eifa-trigger-operator
 ```
 
->**NOTE**: Ensure that the samples has default values to test it out.
+### Building & Generating Manifests
 
-### To Uninstall
-**Delete the instances (CRs) from the cluster:**
+> Make sure you have Go, Docker, and Operator SDK installed.
 
-```sh
-kubectl delete -k config/samples/
+#### 🔨 Build & Generate Manifests
+
+These Makefile targets support build/deploy:
+
+| Command              | Description                                                                 |
+|----------------------|-----------------------------------------------------------------------------|
+| `make deploy-file`   | Generates a ready-to-apply Kubernetes manifest at `config/all-manifests.yaml` |
+
+#### 🐳 Example:
+
+```bash
+export IMG=your-repo/eifa-trigger-operator:latest make deploy-file
+kubectl apply -f config/all-manifests.yaml
 ```
 
-**Delete the APIs(CRDs) from the cluster:**
+---
+## 📘 Status & Conditions
 
-```sh
-make uninstall
-```
+The operator updates status fields automatically after processing:
 
-**UnDeploy the controller from the cluster:**
+- `status.conditions`: Standard Kubernetes-style conditions
+- `status.lastMessage`: Latest activity message for observability
 
-```sh
-make undeploy
-```
+---
 
-## Project Distribution
+## ⚖️ License
 
-Following are the steps to build the installer and distribute this project to users.
+Licensed under the [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0).  
+See [`LICENSE`](./LICENSE) for more details.
 
-1. Build the installer for the image built and published in the registry:
+---
 
-```sh
-make build-installer IMG=<some-registry>/eifa-trigger-operator:tag
-```
+## 🤝 Contributing
 
-NOTE: The makefile target mentioned above generates an 'install.yaml'
-file in the dist directory. This file contains all the resources built
-with Kustomize, which are necessary to install this project without
-its dependencies.
+PRs, bug reports, and ideas are welcome! To contribute:
 
-2. Using the installer
+1. ⭐ Star this repo if you find it useful
+2. Fork it and create your feature branch (`git checkout -b feature/foo`)
+3. Commit your changes (`git commit -am 'Add feature foo'`)
+4. Push to the branch (`git push origin feature/foo`)
+5. Create a new Pull Request
 
-Users can just run kubectl apply -f <URL for YAML BUNDLE> to install the project, i.e.:
+---
 
-```sh
-kubectl apply -f https://raw.githubusercontent.com/<org>/eifa-trigger-operator/<tag or branch>/dist/install.yaml
-```
+## 🙌 Acknowledgements
 
-## Contributing
-// TODO(user): Add detailed information on how you would like others to contribute to this project
-
-**NOTE:** Run `make help` for more information on all potential `make` targets
-
-More information can be found via the [Kubebuilder Documentation](https://book.kubebuilder.io/introduction.html)
-
-## License
-
-Copyright 2025 Erfan.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
+- ⚙️ [Operator SDK](https://sdk.operatorframework.io/)
+- 🔃 [Stakater Reloader](https://github.com/stakater/Reloader) — inspiration for dynamic rollout functionality

@@ -1,27 +1,27 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: erfan
+  name: et-test
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: et-nginx
-  namespace: erfan
+  namespace: et-test
   labels:
-    app: et-update
+    et-kind: et-update
 spec:
   selector:
     matchLabels:
-      app: et-nginx
+      et-kind: et-nginx
   template:
     metadata:
       labels:
-        app: et-nginx
+        et-kind: et-nginx
     spec:
       containers:
       - name: et-nginx
-        image: repo-afra.snappfood.dev/nginx
+        image: nginx
         envFrom:
         - configMapRef:
             name: et-cm
@@ -36,19 +36,19 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: et-cm
-  namespace: erfan
+  namespace: et-test
   labels:
-    app: et-watch
+    et-kind: et-watch
 data:
-  key: value222
+  key: value
 ---
 apiVersion: v1
 kind: Secret
 metadata:
   name: et-secret
-  namespace: erfan
+  namespace: et-test
   labels:
-    app: et-watch
+    et-kind: et-watch
 type: Opaque
 data:
   key: dmFsdWUyMg==
@@ -57,16 +57,16 @@ apiVersion: trigger.eifa.org/v1
 kind: EifaTrigger
 metadata:
   name: et
-  namespace: erfan
+  namespace: et-test
 spec:
   watchList:
   - kind: ConfigMap
     labelSelector:
-      app: et-watch
+      et-kind: et-watch
   - kind: Secret
     labelSelector:
-      app: et-watch
+      et-kind: et-watch
   update:
     kind: Deployment
     labelSelector:
-      app: et-update
+      et-kind: et-update
