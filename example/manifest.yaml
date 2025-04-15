@@ -40,7 +40,7 @@ metadata:
   labels:
     app: et-watch
 data:
-  key: value26
+  key: value28
 ---
 apiVersion: trigger.eifa.org/v1
 kind: EifaTrigger

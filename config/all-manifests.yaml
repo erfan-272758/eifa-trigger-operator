@@ -63,6 +63,23 @@ spec:
                 - kind
                 - labelSelector
                 type: object
+              updateList:
+                items:
+                  properties:
+                    kind:
+                      enum:
+                      - Deployment
+                      - DaemonSet
+                      type: string
+                    labelSelector:
+                      additionalProperties:
+                        type: string
+                      type: object
+                  required:
+                  - kind
+                  - labelSelector
+                  type: object
+                type: array
               watch:
                 description: EifaTriggerSpec defines the desired state of EifaTrigger
                 properties:
@@ -79,10 +96,30 @@ spec:
                 - kind
                 - labelSelector
                 type: object
-            required:
-            - update
-            - watch
+              watchList:
+                items:
+                  description: EifaTriggerSpec defines the desired state of EifaTrigger
+                  properties:
+                    kind:
+                      enum:
+                      - ConfigMap
+                      - Secret
+                      type: string
+                    labelSelector:
+                      additionalProperties:
+                        type: string
+                      type: object
+                  required:
+                  - kind
+                  - labelSelector
+                  type: object
+                type: array
             type: object
+            x-kubernetes-validations:
+            - message: Either 'update' or 'updateList' must be specified
+              rule: has(self.update.kind) || size(self.updateList) > 0
+            - message: Either 'watch' or 'watchList' must be specified
+              rule: has(self.watch.kind) || size(self.watchList) > 0
           status:
             description: EifaTriggerStatus defines the observed state of EifaTrigger
             properties:
@@ -438,7 +475,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.uid
-        image: erfan272758/eifa-trigger-operator:v1.1.2
+        image: erfan272758/eifa-trigger-operator:v1.2.0
         livenessProbe:
           httpGet:
             path: /healthz

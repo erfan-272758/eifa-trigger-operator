@@ -40,8 +40,10 @@ type UpdateSelector struct {
 	LabelSelector map[string]string `json:"labelSelector"`
 }
 type EifaTriggerSpec struct {
-	Watch  WatchSelector  `json:"watch"`
-	Update UpdateSelector `json:"update"`
+	Watch      WatchSelector    `json:"watch,omitempty"`
+	Update     UpdateSelector   `json:"update,omitempty"`
+	WatchList  []WatchSelector  `json:"watchList,omitempty"`
+	UpdateList []UpdateSelector `json:"updateList,omitempty"`
 }
 
 // EifaTriggerStatus defines the observed state of EifaTrigger
@@ -58,6 +60,8 @@ type EifaTrigger struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
+	// +kubebuilder:validation:XValidation:rule="has(self.update.kind) || size(self.updateList) > 0",message="Either 'update' or 'updateList' must be specified"
+	// +kubebuilder:validation:XValidation:rule="has(self.watch.kind) || size(self.watchList) > 0",message="Either 'watch' or 'watchList' must be specified"
 	Spec   EifaTriggerSpec   `json:"spec,omitempty"`
 	Status EifaTriggerStatus `json:"status,omitempty"`
 }

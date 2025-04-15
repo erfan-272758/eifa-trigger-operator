@@ -2,6 +2,7 @@ package controller
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strconv"
 
@@ -104,77 +105,107 @@ func (r *EifaTriggerReconciler) FetchWUList(ctx context.Context, et *triggerv1.E
 
 }
 func (r *EifaTriggerReconciler) FetchUList(ctx context.Context, et *triggerv1.EifaTrigger) ([]client.Object, error) {
-	updateLS, err := metav1.LabelSelectorAsSelector(&metav1.LabelSelector{
-		MatchLabels: et.Spec.Update.LabelSelector,
-	})
-	if err != nil {
-		return nil, fmt.Errorf("invalid update label selector: %w", err)
+
+	var (
+		updateListSpec []triggerv1.UpdateSelector
+		updateObjList  []client.Object
+	)
+
+	if len(et.Spec.UpdateList) == 0 {
+		updateListSpec = []triggerv1.UpdateSelector{et.Spec.Update}
+	} else {
+		updateListSpec = et.Spec.UpdateList
 	}
 
-	if et.Spec.Update.Kind == "Deployment" {
-		var updateList appsv1.DeploymentList
-		if err := r.List(ctx, &updateList, client.InNamespace(et.Namespace), client.MatchingLabelsSelector{Selector: updateLS}); err != nil {
-			return nil, fmt.Errorf("failed to list update objects: %w", err)
-		}
-		updateObjs := make([]client.Object, 0, updateList.Size())
-		for i := range updateList.Items {
-			updateObjs = append(updateObjs, &updateList.Items[i])
-		}
-
-		return updateObjs, nil
-
-	}
-	if et.Spec.Update.Kind == "DaemonSet" {
-		var updateList appsv1.DaemonSetList
-		if err := r.List(ctx, &updateList, client.InNamespace(et.Namespace), client.MatchingLabelsSelector{Selector: updateLS}); err != nil {
-			return nil, fmt.Errorf("failed to list update objects: %w", err)
-		}
-		updateObjs := make([]client.Object, 0, updateList.Size())
-		for i := range updateList.Items {
-			updateObjs = append(updateObjs, &updateList.Items[i])
-		}
-
-		return updateObjs, nil
-
+	if len(updateListSpec) == 0 {
+		return nil, errors.New("one of the .Spec.Update or .Spec.UpdateList should be filled")
 	}
 
-	return nil, fmt.Errorf("invalid .Spec.Update.Kind, %s", et.Spec.Update.Kind)
+	for _, updateSpec := range updateListSpec {
+
+		updateLS, err := metav1.LabelSelectorAsSelector(&metav1.LabelSelector{
+			MatchLabels: updateSpec.LabelSelector,
+		})
+		if err != nil {
+			return nil, fmt.Errorf("invalid update label selector: %w", err)
+		}
+
+		if updateSpec.Kind == "Deployment" {
+			var updateList appsv1.DeploymentList
+			if err := r.List(ctx, &updateList, client.InNamespace(et.Namespace), client.MatchingLabelsSelector{Selector: updateLS}); err != nil {
+				return nil, fmt.Errorf("failed to list update objects: %w", err)
+			}
+			for i := range updateList.Items {
+				updateObjList = append(updateObjList, &updateList.Items[i])
+			}
+			continue
+		}
+		if updateSpec.Kind == "DaemonSet" {
+			var updateList appsv1.DaemonSetList
+			if err := r.List(ctx, &updateList, client.InNamespace(et.Namespace), client.MatchingLabelsSelector{Selector: updateLS}); err != nil {
+				return nil, fmt.Errorf("failed to list update objects: %w", err)
+			}
+			for i := range updateList.Items {
+				updateObjList = append(updateObjList, &updateList.Items[i])
+			}
+			continue
+		}
+
+		return nil, fmt.Errorf("invalid .Spec.Update.Kind or .Spec.UpdateList.Kind, %s", updateSpec.Kind)
+	}
+	return updateObjList, nil
+
 }
 func (r *EifaTriggerReconciler) FetchWList(ctx context.Context, et *triggerv1.EifaTrigger) ([]client.Object, error) {
-	watchLS, err := metav1.LabelSelectorAsSelector(&metav1.LabelSelector{
-		MatchLabels: et.Spec.Watch.LabelSelector,
-	})
-	if err != nil {
-		return nil, fmt.Errorf("invalid watch label selector: %w", err)
+
+	var (
+		watchListSpec []triggerv1.WatchSelector
+		watchObjList  []client.Object
+	)
+
+	if len(et.Spec.WatchList) == 0 {
+		watchListSpec = []triggerv1.WatchSelector{et.Spec.Watch}
+	} else {
+		watchListSpec = et.Spec.WatchList
 	}
 
-	if et.Spec.Watch.Kind == "ConfigMap" {
-		var watchList corev1.ConfigMapList
-		if err := r.List(ctx, &watchList, client.InNamespace(et.Namespace), client.MatchingLabelsSelector{Selector: watchLS}); err != nil {
-			return nil, fmt.Errorf("failed to list watch objects: %w", err)
-		}
-		watchObjs := make([]client.Object, 0, watchList.Size())
-		for i := range watchList.Items {
-			watchObjs = append(watchObjs, &watchList.Items[i])
-		}
-
-		return watchObjs, nil
-
+	if len(watchListSpec) == 0 {
+		return nil, errors.New("one of the .Spec.Watch or .Spec.WatchList should be filled")
 	}
-	if et.Spec.Watch.Kind == "Secret" {
-		var watchList corev1.SecretList
-		if err := r.List(ctx, &watchList, client.InNamespace(et.Namespace), client.MatchingLabelsSelector{Selector: watchLS}); err != nil {
-			return nil, fmt.Errorf("failed to list watch objects: %w", err)
-		}
-		watchObjs := make([]client.Object, 0, watchList.Size())
-		for i := range watchList.Items {
-			watchObjs = append(watchObjs, &watchList.Items[i])
+	for _, watchSpec := range watchListSpec {
+
+		watchLS, err := metav1.LabelSelectorAsSelector(&metav1.LabelSelector{
+			MatchLabels: watchSpec.LabelSelector,
+		})
+		if err != nil {
+			return nil, fmt.Errorf("invalid watch label selector: %w", err)
 		}
 
-		return watchObjs, nil
+		if watchSpec.Kind == "ConfigMap" {
+			var watchList corev1.ConfigMapList
+			if err := r.List(ctx, &watchList, client.InNamespace(et.Namespace), client.MatchingLabelsSelector{Selector: watchLS}); err != nil {
+				return nil, fmt.Errorf("failed to list watch objects: %w", err)
+			}
+			for i := range watchList.Items {
+				watchObjList = append(watchObjList, &watchList.Items[i])
+			}
+
+			continue
+		}
+		if watchSpec.Kind == "Secret" {
+			var watchList corev1.SecretList
+			if err := r.List(ctx, &watchList, client.InNamespace(et.Namespace), client.MatchingLabelsSelector{Selector: watchLS}); err != nil {
+				return nil, fmt.Errorf("failed to list watch objects: %w", err)
+			}
+			for i := range watchList.Items {
+				watchObjList = append(watchObjList, &watchList.Items[i])
+			}
+			continue
+		}
+
+		return nil, fmt.Errorf("invalid .Spec.Watch.Kind or .Spec.WatchList.Kind, %s", watchSpec.Kind)
 	}
-
-	return nil, fmt.Errorf("invalid .Spec.Watch.Kind, %s", et.Spec.Watch.Kind)
+	return watchObjList, nil
 }
 
 func (r *EifaTriggerReconciler) UpdateStatus(ctx context.Context, et *triggerv1.EifaTrigger, cond *metav1.Condition) error {
