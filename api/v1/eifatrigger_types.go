@@ -40,8 +40,8 @@ type UpdateSelector struct {
 	LabelSelector map[string]string `json:"labelSelector"`
 }
 type EifaTriggerSpec struct {
-	Watch      WatchSelector    `json:"watch,omitempty"`
-	Update     UpdateSelector   `json:"update,omitempty"`
+	Watch      *WatchSelector   `json:"watch,omitempty"`
+	Update     *UpdateSelector  `json:"update,omitempty"`
 	WatchList  []WatchSelector  `json:"watchList,omitempty"`
 	UpdateList []UpdateSelector `json:"updateList,omitempty"`
 }

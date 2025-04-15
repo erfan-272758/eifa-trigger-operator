@@ -475,7 +475,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.uid
-        image: erfan272758/eifa-trigger-operator:v1.2.0
+        image: erfan272758/eifa-trigger-operator:v1.2.1
         livenessProbe:
           httpGet:
             path: /healthz

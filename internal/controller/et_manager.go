@@ -111,8 +111,8 @@ func (r *EifaTriggerReconciler) FetchUList(ctx context.Context, et *triggerv1.Ei
 		updateObjList  []client.Object
 	)
 
-	if len(et.Spec.UpdateList) == 0 {
-		updateListSpec = []triggerv1.UpdateSelector{et.Spec.Update}
+	if et.Spec.Update != nil {
+		updateListSpec = []triggerv1.UpdateSelector{*et.Spec.Update}
 	} else {
 		updateListSpec = et.Spec.UpdateList
 	}
@@ -163,8 +163,8 @@ func (r *EifaTriggerReconciler) FetchWList(ctx context.Context, et *triggerv1.Ei
 		watchObjList  []client.Object
 	)
 
-	if len(et.Spec.WatchList) == 0 {
-		watchListSpec = []triggerv1.WatchSelector{et.Spec.Watch}
+	if et.Spec.Watch != nil {
+		watchListSpec = []triggerv1.WatchSelector{*et.Spec.Watch}
 	} else {
 		watchListSpec = et.Spec.WatchList
 	}

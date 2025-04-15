@@ -42,14 +42,28 @@ metadata:
 data:
   key: value28
 ---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: et-secret
+  namespace: erfan
+  labels:
+    app: et-watch
+type: Opaque
+data:
+  key: dmFsdWU=
+---
 apiVersion: trigger.eifa.org/v1
 kind: EifaTrigger
 metadata:
   name: et
   namespace: erfan
 spec:
-  watch:
-    kind: ConfigMap
+  watchList:
+  - kind: ConfigMap
+    labelSelector:
+      app: et-watch
+  - kind: Secret
     labelSelector:
       app: et-watch
   update:
